@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set your Docker Hub username
-DOCKER_USERNAME="your-dockerhub-username"
+DOCKER_USERNAME="anarallc"
 # Set the image name
 IMAGE_NAME="chatwoot"
 # Set the image tag
@@ -11,14 +11,9 @@ IMAGE_TAG="latest"
 FULL_IMAGE_NAME="$DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
 
 echo "Building Docker image using existing Dockerfile: $FULL_IMAGE_NAME"
-# Use the existing Dockerfile in the docker directory
-docker build -t $FULL_IMAGE_NAME -f docker/Dockerfile .
-
-echo "Logging in to Docker Hub"
-docker login
-
-echo "Pushing image to Docker Hub"
-docker push $FULL_IMAGE_NAME
+# Use the existing Dockerfile in the docker directory and build for linux/amd64 platform
+docker buildx create --use --name multi-platform-builder || true
+docker buildx build --platform linux/amd64 -t $FULL_IMAGE_NAME -f docker/Dockerfile --push .
 
 echo "Done! Your image is now available at: $FULL_IMAGE_NAME"
 echo ""

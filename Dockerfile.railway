@@ -1,0 +1,11 @@
+# Railway-specific Dockerfile
+FROM anarallc/chatwoot:latest
+
+# Install additional packages
+RUN apk add --no-cache multirun postgresql-client
+
+# Copy our custom start script
+COPY --chmod=755 start.sh ./
+
+ENTRYPOINT ["/bin/sh"]
+CMD ["start.sh"]

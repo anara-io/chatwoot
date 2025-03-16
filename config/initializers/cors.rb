@@ -5,13 +5,22 @@
 # Ref: https://stackoverflow.com/questions/56960709/rails-font-cors-policy
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins '*'
+    # Parse allowed origins from environment variable or default to '*'
+    allowed_origins = ENV.fetch('CW_CORS_ALLOWED_ORIGINS', '*')
+    # If the value is not '*', split by comma and strip whitespace
+    origins_list = allowed_origins == '*' ? ['*'] : allowed_origins.split(',').map(&:strip)
+
+    origins origins_list
     resource '/packs/*', headers: :any, methods: [:get, :options]
     resource '/audio/*', headers: :any, methods: [:get, :options]
     # Make the public endpoints accessible to the frontend
     resource '/public/api/*', headers: :any, methods: :any
 
-    if ActiveModel::Type::Boolean.new.cast(ENV.fetch('CW_API_ONLY_SERVER', false)) || Rails.env.development?
+    # Enable API access by default, can be disabled with CW_ENABLE_API_ACCESS=false
+    if ActiveModel::Type::Boolean.new.cast(ENV.fetch('CW_ENABLE_API_ACCESS', true)) ||
+       ActiveModel::Type::Boolean.new.cast(ENV.fetch('CW_API_ONLY_SERVER', false)) ||
+       Rails.env.development?
+      # Allow access to all API endpoints and expose authentication headers
       resource '*', headers: :any, methods: :any, expose: %w[access-token client uid expiry]
     end
   end

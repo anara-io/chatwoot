@@ -10,10 +10,16 @@ IMAGE_TAG="latest"
 # Full image name
 FULL_IMAGE_NAME="$DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
 
-echo "Building Docker image using existing Dockerfile: $FULL_IMAGE_NAME"
-# Use the existing Dockerfile in the docker directory and build for linux/amd64 platform
+echo "Building Docker image using our custom Dockerfile: $FULL_IMAGE_NAME"
+# Use our custom Dockerfile that applies CORS changes to the official image
 docker buildx create --use --name multi-platform-builder || true
-docker buildx build --platform linux/amd64 -t $FULL_IMAGE_NAME -f docker/Dockerfile --push .
+
+# Build for linux/amd64 platform
+docker buildx build \
+  --platform linux/amd64 \
+  -t $FULL_IMAGE_NAME \
+  -f Dockerfile.custom \
+  --push .
 
 echo "Done! Your image is now available at: $FULL_IMAGE_NAME"
 echo ""

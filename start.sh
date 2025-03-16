@@ -14,6 +14,6 @@ echo "PostgreSQL is up - continuing"
 echo "Running database migrations..."
 bundle exec rails db:migrate
 
-# Start the Rails server
+# Start the Rails server with our CORS environment variables
 echo "Starting Chatwoot server..."
-bundle exec rails server -b 0.0.0.0 -p ${PORT:-3000}
+exec bundle exec rails server -b 0.0.0.0 -p ${PORT:-3000}
